@@ -1,9 +1,20 @@
+# Python
 __pycache__/
+*.pyc
+
+# Models (large files)
 *.pt
+
+# Videos
+*.mp4
+
+# Directories
 yolov5/
-output_*.mp4
-*.jpg
 runs/
+
+# IDE
 .idea/
 .vscode/
+
+# Env
 .env
