@@ -1,0 +1,8 @@
+# Dataset for fish and rock detection
+path: . # dataset root dir
+train: YOLODataset/images/train
+val: YOLODataset/images/val
+
+# Classes
+nc: 2
+names: ['rock', 'fish']

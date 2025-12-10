@@ -1,0 +1,100 @@
+YOLOv11nで魚と岩を見分ける！GPU環境構築から精度検証までの完全ガイド
+Python
+画像認識
+物体検出
+ultralytics
+YOLO11n
+投稿日 2025年07月15日
+YOLOv11nで魚と岩を見分ける！GPU環境構築から精度検証までの完全ガイド
+はじめに
+魚と岩を見分けるAIって、聞いた瞬間は地味な印象かもしれません。でも実際には、物体検出技術は水産業・環境調査・ロボティクスなど、さまざまな分野で活躍します。
+
+この記事では、Ultralytics社が公開した最新モデル YOLOv11n を使って、「魚 🐟」と「岩 🪨」を識別する物体検出器をゼロから構築する手順を紹介します。
+
+Python + GPU環境で構築したリアルなプロセスを共有するので、YOLOに初挑戦する方や精度改善したい方に向けた参考情報になれば幸いです。
+
+2. 開発環境の準備
+YOLOv11n は PyTorchベースでGPUを活用できる軽量物体検出モデル。以下の環境で構築しました：
+
+OS：Windows 11
+Python：3.10
+仮想環境：Miniconda（yolovenv）
+GPU：NVIDIA RTX（CUDA 12.1）
+仮想環境と依存インストール
+conda create -n yolovenv python=3.10
+conda activate yolovenv
+pip install ultralytics
+GPU確認
+　python　
+
+import torch
+print(torch.cuda.is_available())  # → TrueならOK
+3. データセットの作り方
+アノテーションには Labelme を使用。生成された .json を YOLO形式に変換します。
+
+変換後は以下のような構造になります：
+
+YOLODataset/
+├── images/
+│   ├── train/
+│   └── val/
+├── labels/
+│   ├── train/
+│   └── val/
+dataset.yaml の例（複数クラス）
+yaml
+train: ./YOLODataset/images/train
+val: ./YOLODataset/images/val
+nc: 2
+names: ['rock', 'fish']
+💡 ラベルIDの順序（0がrock, 1がfish）と .txt の class_id が一致している必要があります。
+
+4. YOLOv11nで学習する
+python
+
+from ultralytics import YOLO
+
+model = YOLO("yolo11n.pt")
+model.train(
+    data="E:/path/to/dataset.yaml",
+    epochs=100,
+    imgsz=640,
+    batch=16,
+    device=0
+)
+💾 学習後、bash runs/train/fish_detector_yolo11n/weights/best.pt に最良モデルが保存されます。
+
+5. 推論と精度評価
+検証用画像に対して推論を実行：
+
+python
+
+model.predict(
+    source="E:/path/to/images/val",
+    conf=0.48,
+    show=True,
+    save=True
+)
+🎯 推論画像に枠・ラベルが描画され、runs/detect/predict フォルダに保存されます。
+fishes0015.jpg
+検出例：YOLOv11nがfish / rockを正しく識別（conf=0.48）
+
+TensorBoardによる学習可視化
+tensorboard --logdir runs/train/fish_detector_yolo11n
+📊 精度グラフ（mAP、loss、F1スコア）をブラウザで確認できます。
+
+BoxF1_curve.png
+F1スコア vs 信頼度：conf=0.457で最大性能を記録（YOLOv11n）
+
+6. まとめと今後の展望
+YOLOv11n は軽量ながら精度も十分で、fish / rockのような2クラス構成にも向いています。
+
+今後は次のような展開が可能です：
+
+・GradioなどでWebUI化 → 実用ツールに拡張
+
+・モデルのONNXエクスポート → アプリ連携
+
+・技術記事連載 or スキル提供による収益化 ✍️💰
+
+💬 ご意見・ご感想・改善案などお待ちしています！ 開発者の方、検出精度の比較をしたい方などの参考になれば嬉しいです🐟🪨🔥

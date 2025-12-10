@@ -1,0 +1,9 @@
+__pycache__/
+*.pt
+yolov5/
+output_*.mp4
+*.jpg
+runs/
+.idea/
+.vscode/
+.env
