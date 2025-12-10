@@ -60,7 +60,11 @@ output_filename = f"output_trails_{datetime.datetime.now().strftime('%Y%m%d_%H%M
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 out = cv2.VideoWriter(output_filename, fourcc, fps, (width, height))
 
-print("開始します。'q'で終了")
+print("開始します。'q'で終了、's'でスクリーンショット保存")
+
+# スクリーンショット保存先ディレクトリ
+RESULTS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "results")
+os.makedirs(RESULTS_DIR, exist_ok=True)
 
 while True:
     ret, frame = cap.read()
@@ -121,7 +125,12 @@ while True:
     cv2.imshow("YOLO11 Japanese Tracking & Trails", annotated_frame)
 
     key = cv2.waitKey(1) & 0xFF
-    if key == ord('q'):
+    if key == ord('s') or key == ord('S'):
+        fname = datetime.datetime.now().strftime('%Y%m%d_%H%M%S.png')
+        save_path = os.path.join(RESULTS_DIR, fname)
+        cv2.imwrite(save_path, annotated_frame)
+        print(f"📸 スクリーンショット保存: {save_path}", flush=True)
+    elif key == ord('q'):
         break
 
 cap.release()
